@@ -1,0 +1,81 @@
+(function(){
+  fetch('https://raw.githubusercontent.com/seu-usuario/nome-do-repositorio/main/analise-estrategias.js')
+    .then(response => response.text())
+    .then(script => {
+      const scriptElement = document.createElement('script');
+      scriptElement.text = script;
+      document.body.appendChild(scriptElement);
+      
+      // Estratégias do eBook
+
+      // Exemplo de dados históricos (substituir por uma API real)
+      const dadosHistoricos = [
+        { data: '2023-07-10', hora: '14:00', cor: 'vermelho' },
+        { data: '2023-07-10', hora: '14:01', cor: 'preto' },
+        { data: '2023-07-10', hora: '14:02', cor: 'branco' },
+        { data: '2023-07-09', hora: '14:00', cor: 'vermelho' },
+        { data: '2023-07-09', hora: '14:01', cor: 'preto' }
+      ];
+
+      /**
+       * Função para calcular a cor predominante de um dia específico
+       * @param {String} data - Data no formato 'YYYY-MM-DD'
+       * @returns {String} - Cor predominante
+       */
+      function corPredominante(data) {
+        const diaAnterior = dadosHistoricos.filter(item => item.data === data);
+        const cores = diaAnterior.map(item => item.cor);
+        const corFreq = {};
+        
+        cores.forEach(cor => {
+          corFreq[cor] = (corFreq[cor] || 0) + 1;
+        });
+        
+        return Object.keys(corFreq).reduce((a, b) => corFreq[a] > corFreq[b] ? a : b);
+      }
+
+      /**
+       * Gera uma lista de sinais para o dia atual com base nos resultados anteriores
+       * @param {String} data - Data no formato 'YYYY-MM-DD'
+       * @returns {Array} - Lista de sinais com hora e cor predominante
+       */
+      function gerarListaSinais(data) {
+        const listaSinais = [];
+        const diasAnteriores = dadosHistoricos.filter(item => item.data < data);
+        const coresPorHora = {};
+
+        diasAnteriores.forEach(item => {
+          if (!coresPorHora[item.hora]) {
+            coresPorHora[item.hora] = [];
+          }
+          coresPorHora[item.hora].push(item.cor);
+        });
+
+        for (const hora in coresPorHora) {
+          const cores = coresPorHora[hora];
+          const corFreq = {};
+          
+          cores.forEach(cor => {
+            corFreq[cor] = (corFreq[cor] || 0) + 1;
+          });
+          
+          const corPredom = Object.keys(corFreq).reduce((a, b) => corFreq[a] > corFreq[b] ? a : b);
+          listaSinais.push({ hora: hora, cor: corPredom });
+        }
+
+        return listaSinais;
+      }
+
+      // Exemplo de utilização
+      const dataAtual = '2023-07-11';
+      const listaSinais = gerarListaSinais(dataAtual);
+      console.log('Lista de sinais para o dia atual:');
+      listaSinais.forEach(sinal => {
+        console.log(`Hora: ${sinal.hora}, Cor: ${sinal.cor}`);
+      });
+
+      // Implementar outras estratégias do eBook conforme necessário
+
+    })
+    .catch(err => console.error('Erro ao carregar o script:', err));
+})();
