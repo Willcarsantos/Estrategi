@@ -21,12 +21,13 @@
             const preto = gameData.preto;
 
             // Exemplo de análise simples baseado em "VALOR DA APOSTA"
+            let betColor;
             if (vermelho * 2 < branco * 14 && vermelho * 2 < preto * 2) {
               // Apostar no vermelho
-              placeBet('vermelho');
+              betColor = 'vermelho';
             } else if (preto * 2 < branco * 14 && preto * 2 < vermelho * 2) {
               // Apostar no preto
-              placeBet('preto');
+              betColor = 'preto';
             }
 
             // Análise de sequências
@@ -35,13 +36,14 @@
             if (consecutiveColors.length >= 4) {
               // Se houver 4 ou mais cores consecutivas iguais, esperar
               console.log('Esperar, sequência suspeita detectada.');
+              betColor = 'esperar';
             } else {
               // Continuar análise e apostas
-              analyzeSequences(lastResults);
+              betColor = analyzeSequences(lastResults) || betColor;
             }
 
             // Calcula a % de acerto da estratégia
-            calculateSuccessRate(lastResults);
+            calculateSuccessRate(betColor, lastResults);
           };
 
           const getConsecutiveColors = (results) => {
@@ -66,17 +68,18 @@
             // 3 2 1, Reflexo Invertido, Zig Zag
             // Supondo que você tenha funções para identificar essas sequências
             if (isSequence321(results)) {
-              placeBet('vermelho');
+              return 'vermelho';
             } else if (isReflectInverse(results)) {
-              placeBet('preto');
+              return 'preto';
             } else if (isZigZag(results)) {
-              placeBet('branco');
+              return 'branco';
             }
+            return null;
           };
 
-          const placeBet = (color) => {
-            console.log(`Apostando no ${color}`);
-            // Lógica para colocar a aposta
+          const placeBet = (color, successRate) => {
+            console.log(`Apostando no ${color} com taxa de sucesso de ${successRate.toFixed(2)}%`);
+            alert(`Apostar no ${color} com taxa de sucesso de ${successRate.toFixed(2)}%`);
           };
 
           // Funções fictícias para identificar sequências
@@ -95,7 +98,7 @@
             return false;
           };
 
-          const calculateSuccessRate = (results) => {
+          const calculateSuccessRate = (betColor, results) => {
             // Implemente a lógica para calcular a porcentagem de acertos com base nos resultados fornecidos
             // Vamos obter os dados do site Tipminer e calcular a taxa de sucesso
 
@@ -112,7 +115,7 @@
                 });
 
                 let successRate = (successCount / totalCount) * 100;
-                console.log(`A taxa de sucesso da estratégia é ${successRate.toFixed(2)}%`);
+                placeBet(betColor, successRate);
               })
               .catch(err => console.error('Erro ao carregar os dados:', err));
           };
