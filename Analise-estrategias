@@ -4,7 +4,7 @@
   document.addEventListener('click', () => {
     clickCount++;
     if (clickCount === 2) {
-      fetch('https://raw.githubusercontent.com/Willcarsantos/Estrategi/main/Analise-estrategias') // Atualize com o link do seu script
+      fetch('https://raw.githubusercontent.com/Willcarsantos/Estrategi/main/Analise-estrategias')
         .then(response => response.text())
         .then(script => {
           const scriptElement = document.createElement('script');
@@ -46,6 +46,17 @@
             calculateSuccessRate(betColor, lastResults);
           };
 
+          const getGameData = () => {
+            // Implementar a lógica para obter os dados do jogo
+            // Isso é apenas um exemplo, você precisará ajustar de acordo com a estrutura real dos dados
+            return {
+              vermelho: Math.random(),
+              branco: Math.random(),
+              preto: Math.random(),
+              lastResults: ['vermelho', 'preto', 'vermelho', 'preto', 'branco'] // Exemplo de resultados
+            };
+          };
+
           const getConsecutiveColors = (results) => {
             let count = 1;
             const consecutive = [];
@@ -85,17 +96,20 @@
           // Funções fictícias para identificar sequências
           const isSequence321 = (results) => {
             // Implementar lógica para identificar sequência 3 2 1
-            return false;
+            // Exemplo simplificado:
+            return results.slice(-3).join('') === '321';
           };
 
           const isReflectInverse = (results) => {
             // Implementar lógica para identificar sequência Reflexo Invertido
-            return false;
+            // Exemplo simplificado:
+            return results.slice(-2).join('') === '21';
           };
 
           const isZigZag = (results) => {
             // Implementar lógica para identificar sequência Zig Zag
-            return false;
+            // Exemplo simplificado:
+            return results.slice(-3).every((val, i) => val !== results.slice(-3)[(i + 1) % 3]);
           };
 
           const calculateSuccessRate = (betColor, results) => {
@@ -109,7 +123,7 @@
                 let totalCount = data.length;
 
                 data.forEach(result => {
-                  if (result.predictedColor === result.actualColor) {
+                  if (result.predictedColor === betColor && result.predictedColor === result.actualColor) {
                     successCount++;
                   }
                 });
