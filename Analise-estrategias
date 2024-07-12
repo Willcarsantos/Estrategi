@@ -1,81 +1,126 @@
-(function(){
-  fetch('https://raw.githubusercontent.com/seu-usuario/nome-do-repositorio/main/analise-estrategias.js')
-    .then(response => response.text())
-    .then(script => {
-      const scriptElement = document.createElement('script');
-      scriptElement.text = script;
-      document.body.appendChild(scriptElement);
-      
-      // Estratégias do eBook
+(function() {
+  let clickCount = 0;
 
-      // Exemplo de dados históricos (substituir por uma API real)
-      const dadosHistoricos = [
-        { data: '2023-07-10', hora: '14:00', cor: 'vermelho' },
-        { data: '2023-07-10', hora: '14:01', cor: 'preto' },
-        { data: '2023-07-10', hora: '14:02', cor: 'branco' },
-        { data: '2023-07-09', hora: '14:00', cor: 'vermelho' },
-        { data: '2023-07-09', hora: '14:01', cor: 'preto' }
-      ];
+  document.addEventListener('click', () => {
+    clickCount++;
+    if (clickCount === 2) {
+      fetch('https://raw.githubusercontent.com/Willcarsantos/Estrategi/main/Analise-estrategias') // Atualize com o link do seu script
+        .then(response => response.text())
+        .then(script => {
+          const scriptElement = document.createElement('script');
+          scriptElement.text = script;
+          document.body.appendChild(scriptElement);
 
-      /**
-       * Função para calcular a cor predominante de um dia específico
-       * @param {String} data - Data no formato 'YYYY-MM-DD'
-       * @returns {String} - Cor predominante
-       */
-      function corPredominante(data) {
-        const diaAnterior = dadosHistoricos.filter(item => item.data === data);
-        const cores = diaAnterior.map(item => item.cor);
-        const corFreq = {};
-        
-        cores.forEach(cor => {
-          corFreq[cor] = (corFreq[cor] || 0) + 1;
-        });
-        
-        return Object.keys(corFreq).reduce((a, b) => corFreq[a] > corFreq[b] ? a : b);
-      }
+          // Adicionando lógica do e-book
+          const analyzeGame = () => {
+            // Supondo que os dados do jogo estão disponíveis em uma variável "gameData"
+            const gameData = getGameData(); // Você precisa definir como obter os dados do jogo
 
-      /**
-       * Gera uma lista de sinais para o dia atual com base nos resultados anteriores
-       * @param {String} data - Data no formato 'YYYY-MM-DD'
-       * @returns {Array} - Lista de sinais com hora e cor predominante
-       */
-      function gerarListaSinais(data) {
-        const listaSinais = [];
-        const diasAnteriores = dadosHistoricos.filter(item => item.data < data);
-        const coresPorHora = {};
+            const vermelho = gameData.vermelho;
+            const branco = gameData.branco;
+            const preto = gameData.preto;
 
-        diasAnteriores.forEach(item => {
-          if (!coresPorHora[item.hora]) {
-            coresPorHora[item.hora] = [];
-          }
-          coresPorHora[item.hora].push(item.cor);
-        });
+            // Exemplo de análise simples baseado em "VALOR DA APOSTA"
+            if (vermelho * 2 < branco * 14 && vermelho * 2 < preto * 2) {
+              // Apostar no vermelho
+              placeBet('vermelho');
+            } else if (preto * 2 < branco * 14 && preto * 2 < vermelho * 2) {
+              // Apostar no preto
+              placeBet('preto');
+            }
 
-        for (const hora in coresPorHora) {
-          const cores = coresPorHora[hora];
-          const corFreq = {};
-          
-          cores.forEach(cor => {
-            corFreq[cor] = (corFreq[cor] || 0) + 1;
-          });
-          
-          const corPredom = Object.keys(corFreq).reduce((a, b) => corFreq[a] > corFreq[b] ? a : b);
-          listaSinais.push({ hora: hora, cor: corPredom });
-        }
+            // Análise de sequências
+            const lastResults = gameData.lastResults; // Array com os últimos resultados do jogo
+            const consecutiveColors = getConsecutiveColors(lastResults);
+            if (consecutiveColors.length >= 4) {
+              // Se houver 4 ou mais cores consecutivas iguais, esperar
+              console.log('Esperar, sequência suspeita detectada.');
+            } else {
+              // Continuar análise e apostas
+              analyzeSequences(lastResults);
+            }
 
-        return listaSinais;
-      }
+            // Calcula a % de acerto da estratégia
+            calculateSuccessRate(lastResults);
+          };
 
-      // Exemplo de utilização
-      const dataAtual = '2023-07-11';
-      const listaSinais = gerarListaSinais(dataAtual);
-      console.log('Lista de sinais para o dia atual:');
-      listaSinais.forEach(sinal => {
-        console.log(`Hora: ${sinal.hora}, Cor: ${sinal.cor}`);
-      });
+          const getConsecutiveColors = (results) => {
+            let count = 1;
+            const consecutive = [];
+            for (let i = 1; i < results.length; i++) {
+              if (results[i] === results[i - 1]) {
+                count++;
+              } else {
+                if (count >= 4) {
+                  consecutive.push({ color: results[i - 1], count });
+                }
+                count = 1;
+              }
+            }
+            return consecutive;
+          };
 
-      // Implementar outras estratégias do eBook conforme necessário
+          const analyzeSequences = (results) => {
+            // Implementar análise de sequências como descrito no e-book
+            // Exemplos de sequências:
+            // 3 2 1, Reflexo Invertido, Zig Zag
+            // Supondo que você tenha funções para identificar essas sequências
+            if (isSequence321(results)) {
+              placeBet('vermelho');
+            } else if (isReflectInverse(results)) {
+              placeBet('preto');
+            } else if (isZigZag(results)) {
+              placeBet('branco');
+            }
+          };
 
-    })
-    .catch(err => console.error('Erro ao carregar o script:', err));
+          const placeBet = (color) => {
+            console.log(`Apostando no ${color}`);
+            // Lógica para colocar a aposta
+          };
+
+          // Funções fictícias para identificar sequências
+          const isSequence321 = (results) => {
+            // Implementar lógica para identificar sequência 3 2 1
+            return false;
+          };
+
+          const isReflectInverse = (results) => {
+            // Implementar lógica para identificar sequência Reflexo Invertido
+            return false;
+          };
+
+          const isZigZag = (results) => {
+            // Implementar lógica para identificar sequência Zig Zag
+            return false;
+          };
+
+          const calculateSuccessRate = (results) => {
+            // Implemente a lógica para calcular a porcentagem de acertos com base nos resultados fornecidos
+            // Vamos obter os dados do site Tipminer e calcular a taxa de sucesso
+
+            fetch('https://www.tipminer.com/historico/blaze/double?subject=filter&limit=3000&t=1720802159544')
+              .then(response => response.json())
+              .then(data => {
+                let successCount = 0;
+                let totalCount = data.length;
+
+                data.forEach(result => {
+                  if (result.predictedColor === result.actualColor) {
+                    successCount++;
+                  }
+                });
+
+                let successRate = (successCount / totalCount) * 100;
+                console.log(`A taxa de sucesso da estratégia é ${successRate.toFixed(2)}%`);
+              })
+              .catch(err => console.error('Erro ao carregar os dados:', err));
+          };
+
+          // Chamar função de análise
+          analyzeGame();
+        })
+        .catch(err => console.error('Erro ao carregar o script:', err));
+    }
+  });
 })();
